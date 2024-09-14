@@ -290,7 +290,7 @@ public class KaiMovement : MonoBehaviour
             rb.velocity = new Vector3(targetFlatVel.x, rb.velocity.y, targetFlatVel.z);
         }
         
-        // rb.useGravity = !OnSlope();
+        rb.useGravity = !OnSlope();
     }
 
     void Jump(){
@@ -340,16 +340,16 @@ public class KaiMovement : MonoBehaviour
             currentConstraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
         }else{
             currentConstraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
-            // print(currentConstraints);
+            //print(currentConstraints);
         }
-        // rb.constraints = currentConstraints;
+        rb.constraints = currentConstraints;
     }
 
     bool OnSlope()
     {
         if(Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + groundedDst, whatIsGround)){
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
-            print(angle);
+            // print(angle);
             // print(slopeHit.collider);
             // print("Normal: " + slopeHit.normal + "   Angle: " + angle + "      exiting slope: " + exitingSlope);
             return angle < maxSlopeAngle && angle >= 1f;
@@ -533,6 +533,7 @@ public class KaiMovement : MonoBehaviour
         float rotAngle = initialAngle - 90f;
         float t = 0f;
         movingAlongZAxis = !movingAlongZAxis;
+        print(movingAlongZAxis);
         turningCorner = true;
         // print(movingAlongZAxis);
 
@@ -545,6 +546,7 @@ public class KaiMovement : MonoBehaviour
 
         movementEnabled = true;
         turningCorner = false;
+        print(turningCorner);
     }
 
     public void ToggleBagOff() {
