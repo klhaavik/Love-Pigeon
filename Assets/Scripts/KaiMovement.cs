@@ -199,7 +199,7 @@ public class KaiMovement : MonoBehaviour
 
         //testing purposes
         if(Input.GetKeyUp(KeyCode.R)){
-            StartCoroutine(Reset(0, reloadDuration));
+            StartCoroutine(ResetLevel(0, reloadDuration));
         }
     }
 
@@ -333,14 +333,14 @@ public class KaiMovement : MonoBehaviour
         }
 
         // UpdateCameraTrackingValues();
-
+        // print("here");
         if(turningCorner) return;
 
         if(movingAlongZAxis){
             currentConstraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
         }else{
             currentConstraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
-            //print(currentConstraints);
+            print(currentConstraints);
         }
         rb.constraints = currentConstraints;
     }
@@ -414,7 +414,7 @@ public class KaiMovement : MonoBehaviour
     void OnCollisionEnter(Collision col){
         // print("colliding");
         if(col.gameObject.layer == 9){
-            StartCoroutine(Reset(reloadDelay, reloadDuration));
+            StartCoroutine(ResetLevel(reloadDelay, reloadDuration));
         }else if(col.gameObject.CompareTag("Ladder")){
             // print("on ladder");
             touchingLadder = true;
@@ -423,7 +423,7 @@ public class KaiMovement : MonoBehaviour
 
     void OnTriggerEnter(Collider col){
         if(col.gameObject.layer == 6 && !ResetInProgress){
-            StartCoroutine(Reset(0, reloadDuration));
+            StartCoroutine(ResetLevel(0, reloadDuration));
             ResetInProgress = true;
         }
     }
@@ -490,7 +490,7 @@ public class KaiMovement : MonoBehaviour
         // Debug.Break();
     }
 
-    private IEnumerator Reset(float reloadDelay, float reloadDuration){
+    private IEnumerator ResetLevel(float reloadDelay, float reloadDuration){
         SetEnableMovement(false);
         horizontalMovement = 0;
         yield return new WaitForSeconds(reloadDelay);
@@ -521,32 +521,33 @@ public class KaiMovement : MonoBehaviour
 
 
 
-    public void ToggleCorner(){
+    public void ToggleCorner(bool rotationDir){
         movementEnabled = false;
         rb.velocity = Vector3.zero;
-        StartCoroutine(TurnCorner());
+        StartCoroutine(TurnCorner(rotationDir, 1f));
     }
 
-    private IEnumerator TurnCorner()
+    private IEnumerator TurnCorner(bool turningRight, float duration)
     {
         float initialAngle = orientation.localEulerAngles.y;
-        float rotAngle = initialAngle - 90f;
+        float rotAngle = turningRight ? initialAngle + 90f : initialAngle - 90f;
         float t = 0f;
         movingAlongZAxis = !movingAlongZAxis;
-        print(movingAlongZAxis);
+        print("Z-axis: " + movingAlongZAxis);
         turningCorner = true;
         // print(movingAlongZAxis);
 
         while(true){
-            t += Time.deltaTime;
+            t += Time.deltaTime / duration;
             orientation.localEulerAngles = new Vector3(0, Mathf.SmoothStep(initialAngle, rotAngle, t), 0);
-            if (Mathf.Approximately(orientation.localEulerAngles.y % 90f, 0f)) break;
+            if (t >= 1) break;
             yield return null;
+            print("Angle to go: " + orientation.localEulerAngles.y % 90f);
         }
 
         movementEnabled = true;
         turningCorner = false;
-        print(turningCorner);
+        print("Turning: " + turningCorner);
     }
 
     public void ToggleBagOff() {

@@ -5,6 +5,7 @@ using UnityEngine;
 public class CornerTrigger : MonoBehaviour
 {
     bool triggered = false;
+    public bool isRightTurn;
     KaiMovement movement;
 
     void Start(){
@@ -13,7 +14,7 @@ public class CornerTrigger : MonoBehaviour
 
     public void OnTriggerEnter(Collider col){
         if(!triggered){
-            movement.ToggleCorner();
+            movement.ToggleCorner(isRightTurn);
             triggered = true;
         }
     }
